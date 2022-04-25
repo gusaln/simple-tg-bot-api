@@ -1,0 +1,59 @@
+{
+    "name": "gusaln/simple-tg-bot-api",
+    "type": "library",
+    "description": "Minimalist strongly-typed Telegram bot API",
+    "keywords": [
+        "telegram-bot-api",
+        "telegram",
+        "telegram-bot",
+        "telegram-php",
+        "php-telegram-bot",
+        "bot",
+        "php-bot"
+    ],
+    "homepage": "https://github.com/gusaln/simple-tg-bot-api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gustavo López",
+            "email": "git.gutavolopez.xyz@gmail.com",
+            "homepage": "https://github.com/gusaln",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "GusALN\\TelegramBotApi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "files": [
+            "tools/CodeGeneration/utils.php"
+        ],
+        "psr-4": {
+            "GusALN\\TelegramBotApi\\CodeGeneration\\": "tools/CodeGeneration"
+        }
+    },
+    "scripts": {
+        "fix-style": "php-cs-fixer fix"
+      },
+    "require": {
+        "php": "^8.0",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.0|^7.0"
+    },
+    "require-dev": {
+        "php": "^8.0",
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "phpro/grumphp-shim": "^1.11",
+        "phpstan/phpstan": "^1.5",
+        "symfony/css-selector": "^6.0",
+        "symfony/dom-crawler": "^6.0"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpro/grumphp-shim": true
+        }
+    }
+}
