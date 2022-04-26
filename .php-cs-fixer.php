@@ -7,6 +7,7 @@ $finder = Finder::create()
     ->in(__DIR__.DIRECTORY_SEPARATOR.'src')
     ->in(__DIR__.DIRECTORY_SEPARATOR.'tools')
     ->in(__DIR__.DIRECTORY_SEPARATOR.'scripts')
+    ->in(__DIR__.DIRECTORY_SEPARATOR.'examples')
     ->notPath([
         "/MethodRequests/",
         "/Types/",
