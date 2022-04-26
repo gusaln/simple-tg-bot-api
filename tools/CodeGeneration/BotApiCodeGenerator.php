@@ -51,7 +51,6 @@ class BotApiCodeGenerator extends CodeGenerator
 
         $usingStatements = $this->generateUsingStatements();
 
-        // $constructor = $this->generateConstructorMethod();
         $methods = $this->generateMethods();
 
         return <<<TXT
@@ -66,6 +65,7 @@ class BotApiCodeGenerator extends CodeGenerator
             {
             {$methods}
             }
+
             TXT;
     }
 
@@ -105,28 +105,26 @@ class BotApiCodeGenerator extends CodeGenerator
 
     private function generateMethod(MethodTypeDefinition $definition): string
     {
-        $methodDescription = [];
+        $docstringPadding = '     ';
+        $methodDocstring = [];
         foreach ($definition->description as $descLine) {
             foreach (explode("\n", $descLine) as $line) {
-                $methodDescription[] = " * {$line}";
+                $methodDocstring[] = "{$docstringPadding}* {$line}";
             }
         }
-        $methodDescription = implode("\n", $methodDescription);
 
         $methodName = $definition->name;
         $methodArgument = MethodRequestObjectCodeGenerator::getClassName($definition);
         $methodReturn = $definition->return->typeHint();
-        $methodDocstringReturn = $definition->return->typeHint() != $definition->return->docstringTypeHint()
-            ? "\n".implode("\n", [
-                ' *',
-                " * @return {$definition->return->docstringTypeHint()}",
-            ])
-            : '';
+        if ($definition->return->typeHint() != $definition->return->docstringTypeHint()) {
+            $methodDocstring[] = "{$docstringPadding}*";
+            $methodDocstring[] = "{$docstringPadding}* @return {$definition->return->docstringTypeHint()}";
+        }
 
         $body = '$this->call($request)->getPayload()';
         if (! $definition->return->isUnion()) {
             if ($definition->return->isArray) {
-                $body = "array_map(fn(\$p) => {$definition->return->individualType}::fromPayload(\$p), {$body})";
+                $body = "array_map(fn (\$p) => {$definition->return->individualType}::fromPayload(\$p), {$body})";
             } elseif (! $this->isPrimitive($definition->return->singleType()) && 'mixed' != $definition->return->singleType()) {
                 $body = "{$definition->return->singleType()}::fromPayload({$body})";
             }
@@ -139,10 +137,12 @@ class BotApiCodeGenerator extends CodeGenerator
         }
         $body = "return {$body};";
 
+        $methodDocstring = implode("\n", $methodDocstring);
+
         return <<<TXT
                 /**
-                {$methodDescription}{$methodDocstringReturn}
-                */
+            {$methodDocstring}
+                 */
                 public function {$methodName}({$methodArgument} \$request): {$methodReturn}
                 {
                     {$body}
