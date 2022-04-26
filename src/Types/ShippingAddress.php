@@ -30,7 +30,7 @@ class ShippingAddress implements JsonSerializable
     }
 
     /** @phpstan-param array<string,mixed> $payload */
-    public static function fromPayload(array $payload): self
+    public static function fromPayload(array $payload = []): self
     {
         return new self(
             $payload['country_code'],

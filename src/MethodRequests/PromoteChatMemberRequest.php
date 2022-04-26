@@ -44,7 +44,7 @@ class PromoteChatMemberRequest extends MethodRequest
     }
 
     /** @phpstan-param array<string,mixed> $payload */
-    public static function fromPayload(array $payload): self
+    public static function fromPayload(array $payload = []): self
     {
         return new self(
             $payload['chat_id'],

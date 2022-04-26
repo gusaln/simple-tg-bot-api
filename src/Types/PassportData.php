@@ -24,7 +24,7 @@ class PassportData implements JsonSerializable
     }
 
     /** @phpstan-param array<string,mixed> $payload */
-    public static function fromPayload(array $payload): self
+    public static function fromPayload(array $payload = []): self
     {
         return new self(
             array_map(fn($t) => EncryptedPassportElement::fromPayload($t), $payload['data']),
