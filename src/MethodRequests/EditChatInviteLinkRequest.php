@@ -29,15 +29,16 @@ class EditChatInviteLinkRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
             $payload['invite_link'],
-            $payload['name'],
-            $payload['expire_date'],
-            $payload['member_limit'],
-            $payload['creates_join_request'],
+            $payload['name'] ?? null,
+            $payload['expire_date'] ?? null,
+            $payload['member_limit'] ?? null,
+            $payload['creates_join_request'] ?? null,
         );
     }
 

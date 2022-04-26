@@ -26,13 +26,14 @@ class AnswerShippingQueryRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['shipping_query_id'],
             $payload['ok'],
-            $payload['shipping_options'],
-            $payload['error_message'],
+            isset($payload['shipping_options']) ? array_map(fn($t) => ShippingOption::fromPayload($t), $payload['shipping_options']) : null,
+            $payload['error_message'] ?? null,
         );
     }
 

@@ -7,6 +7,9 @@ namespace GusALN\TelegramBotApi\CodeGeneration;
 use GusALN\TelegramBotApi\CodeGeneration\Definitions\MethodTypeDefinition;
 use GusALN\TelegramBotApi\CodeGeneration\Definitions\ObjectTypeDefinition;
 
+/**
+ * Generates the BotApi class with all its methods.
+ */
 class BotApiCodeGenerator extends CodeGenerator
 {
     /**
@@ -51,7 +54,7 @@ class BotApiCodeGenerator extends CodeGenerator
 
         $usingStatements = $this->generateUsingStatements();
 
-        $methods = $this->generateMethods();
+        $methods = $this->mergeBlocks($this->generateMethods());
 
         return <<<TXT
             <?php
@@ -67,6 +70,11 @@ class BotApiCodeGenerator extends CodeGenerator
             }
 
             TXT;
+    }
+
+    protected function generateClassBodyBlocks(): array
+    {
+        return $this->generateMethods();
     }
 
     private function generateUsingStatements(): string
@@ -98,9 +106,9 @@ class BotApiCodeGenerator extends CodeGenerator
         return implode("\n", array_unique($usingStatements))."\n";
     }
 
-    private function generateMethods(): string
+    private function generateMethods(): array
     {
-        return implode("\n\n", array_map(fn ($method) => $this->generateMethod($method), $this->methodDefinitions));
+        return array_map(fn ($method) => $this->generateMethod($method), $this->methodDefinitions);
     }
 
     private function generateMethod(MethodTypeDefinition $definition): string

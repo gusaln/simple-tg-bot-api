@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace GusALN\TelegramBotApi\CodeGeneration;
 
+use GusALN\TelegramBotApi\CodeGeneration\Concerns\GeneratesFromPayloadMethod;
+use GusALN\TelegramBotApi\CodeGeneration\Concerns\GeneratesJsonSerializeMethod;
 use GusALN\TelegramBotApi\CodeGeneration\Definitions\ObjectTypeDefinition;
 use GusALN\TelegramBotApi\CodeGeneration\Definitions\PropertyDefinition;
-use GusALN\TelegramBotApi\CodeGeneration\Definitions\TypedDefinition;
 
+/**
+ * Generates classes for API types.
+ */
 abstract class TypeObjectCodeGenerator extends CodeGenerator
 {
+    use GeneratesFromPayloadMethod;
+    use GeneratesJsonSerializeMethod;
+
     protected ObjectTypeDefinition $definition;
 
     public function generate(): void
@@ -54,25 +61,6 @@ abstract class TypeObjectCodeGenerator extends CodeGenerator
         sort($usingStatements);
 
         return implode("\n", array_unique($usingStatements))."\n";
-    }
-
-    /**
-     * Generates the blocks of the class.
-     *
-     * @return array<int, string|null>
-     */
-    abstract protected function generateClassBodyBlocks(): array;
-
-    /**
-     * Stitches the blocks of a class together.
-     *
-     * If a block is null, it will be left out of the contents of the class.
-     *
-     * @param array<int, string|null> $block
-     */
-    protected function mergeBlocks(array $block): string
-    {
-        return implode("\n\n", array_filter($block));
     }
 
     protected function generateDocstring(): string
@@ -148,57 +136,13 @@ abstract class TypeObjectCodeGenerator extends CodeGenerator
         return implode("\n", $constructorDocstring)."\n".implode("\n", $constructorSignature);
     }
 
-    protected function generateFromPayloadMethodArgument(string $padding, string $key, TypedDefinition $definition)
+    protected function getPropertiesDeserializableFromPayload(): array
     {
-        if ($definition->isUnion() || $this->isPrimitive($definition->singleType())) {
-            return $definition->isNullable()
-                ? "{$padding}\$payload['{$key}'] ?? null,"
-                : "{$padding}\$payload['{$key}'],";
-        }
-
-        $objectClass = $definition->singleType();
-
-        $objectMapping = $definition->isArray
-            ? "array_map(fn(\$t) => {$objectClass}::fromPayload(\$t), \$payload['{$key}'])"
-            : "{$objectClass}::fromPayload(\$payload['{$key}'])";
-
-        return $definition->isNullable()
-                ? "{$padding}isset(\$payload['{$key}']) ? {$objectMapping} : null,"
-                : "{$padding}$objectMapping,";
+        return $this->definition->properties;
     }
 
-    protected function generateJsonSerializeMethod(): string
+    protected function getJsonSerializableProperties(): array
     {
-        if (empty($this->definition->properties)) {
-            $lines = [
-                '    public function jsonSerialize(): mixed',
-                '    {',
-                '        return [];',
-                '    }',
-            ];
-
-            return implode("\n", $lines);
-        }
-
-        $jsonSerializeMethod = [
-            '    public function jsonSerialize(): mixed',
-            '    {',
-            '        return array_filter([',
-            // '    }',
-        ];
-
-        $padding = '            ';
-
-        foreach ($this->definition->properties as $propertyDefinition) {
-            $key = $propertyDefinition->name;
-            $property = camel_case($propertyDefinition->name);
-
-            $jsonSerializeMethod[] = "{$padding}'{$key}' => \$this->{$property},";
-        }
-
-        $jsonSerializeMethod[] = '        ]);';
-        $jsonSerializeMethod[] = '    }';
-
-        return implode("\n", $jsonSerializeMethod);
+        return $this->definition->properties;
     }
 }

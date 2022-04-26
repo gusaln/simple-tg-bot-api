@@ -94,42 +94,8 @@ final class ChildTypeWithTypePropertyObjectCodeGenerator extends TypeObjectCodeG
         ]);
     }
 
-    private function generateFromPayloadMethod(): string
+    protected function getPropertiesDeserializableFromPayload(): array
     {
-        if (empty($this->definition->properties)) {
-            $lines = [
-                '    /** @phpstan-param array<string,mixed> $payload */',
-                '    public static function fromPayload(array $payload): self',
-                '    {',
-                '        return new self();',
-                '    }',
-            ];
-
-            return implode("\n", $lines);
-        }
-
-        $fromPayloadMethod = [
-            '    /** @phpstan-param array<string,mixed> $payload */',
-            '    public static function fromPayload(array $payload): self',
-            '    {',
-            '        return new self(',
-        ];
-
-        $padding = '            ';
-
-        foreach ($this->definition->properties as $propertyDefinition) {
-            if ($this->typePropertyName == $propertyDefinition->name) {
-                continue;
-            }
-
-            $key = $propertyDefinition->name;
-
-            $fromPayloadMethod[] = $this->generateFromPayloadMethodArgument($padding, $key, $propertyDefinition);
-        }
-
-        $fromPayloadMethod[] = '        );';
-        $fromPayloadMethod[] = '    }';
-
-        return implode("\n", $fromPayloadMethod);
+        return array_filter($this->definition->properties, fn (PropertyDefinition $p) => $this->typePropertyName != $p->name);
     }
 }

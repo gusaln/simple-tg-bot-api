@@ -27,13 +27,14 @@ class ForwardMessageRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
             $payload['from_chat_id'],
-            $payload['disable_notification'],
-            $payload['protect_content'],
+            $payload['disable_notification'] ?? null,
+            $payload['protect_content'] ?? null,
             $payload['message_id'],
         );
     }

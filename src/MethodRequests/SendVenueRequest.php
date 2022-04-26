@@ -49,7 +49,8 @@ class SendVenueRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
@@ -57,15 +58,15 @@ class SendVenueRequest extends MethodRequest
             $payload['longitude'],
             $payload['title'],
             $payload['address'],
-            $payload['foursquare_id'],
-            $payload['foursquare_type'],
-            $payload['google_place_id'],
-            $payload['google_place_type'],
-            $payload['disable_notification'],
-            $payload['protect_content'],
-            $payload['reply_to_message_id'],
-            $payload['allow_sending_without_reply'],
-            $payload['reply_markup'],
+            $payload['foursquare_id'] ?? null,
+            $payload['foursquare_type'] ?? null,
+            $payload['google_place_id'] ?? null,
+            $payload['google_place_type'] ?? null,
+            $payload['disable_notification'] ?? null,
+            $payload['protect_content'] ?? null,
+            $payload['reply_to_message_id'] ?? null,
+            $payload['allow_sending_without_reply'] ?? null,
+            $payload['reply_markup'] ?? null,
         );
     }
 

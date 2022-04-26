@@ -36,18 +36,19 @@ class EditMessageLiveLocationRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
-            $payload['chat_id'],
-            $payload['message_id'],
-            $payload['inline_message_id'],
+            $payload['chat_id'] ?? null,
+            $payload['message_id'] ?? null,
+            $payload['inline_message_id'] ?? null,
             $payload['latitude'],
             $payload['longitude'],
-            $payload['horizontal_accuracy'],
-            $payload['heading'],
-            $payload['proximity_alert_radius'],
-            $payload['reply_markup'],
+            $payload['horizontal_accuracy'] ?? null,
+            $payload['heading'] ?? null,
+            $payload['proximity_alert_radius'] ?? null,
+            isset($payload['reply_markup']) ? InlineKeyboardMarkup::fromPayload($payload['reply_markup']) : null,
         );
     }
 

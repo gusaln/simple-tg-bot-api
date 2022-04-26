@@ -25,13 +25,14 @@ class GetGameHighScoresRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['user_id'],
-            $payload['chat_id'],
-            $payload['message_id'],
-            $payload['inline_message_id'],
+            $payload['chat_id'] ?? null,
+            $payload['message_id'] ?? null,
+            $payload['inline_message_id'] ?? null,
         );
     }
 

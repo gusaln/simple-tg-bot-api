@@ -23,12 +23,13 @@ class UnbanChatMemberRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
             $payload['user_id'],
-            $payload['only_if_banned'],
+            $payload['only_if_banned'] ?? null,
         );
     }
 

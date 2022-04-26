@@ -26,13 +26,14 @@ class EditMessageReplyMarkupRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
-            $payload['chat_id'],
-            $payload['message_id'],
-            $payload['inline_message_id'],
-            $payload['reply_markup'],
+            $payload['chat_id'] ?? null,
+            $payload['message_id'] ?? null,
+            $payload['inline_message_id'] ?? null,
+            isset($payload['reply_markup']) ? InlineKeyboardMarkup::fromPayload($payload['reply_markup']) : null,
         );
     }
 

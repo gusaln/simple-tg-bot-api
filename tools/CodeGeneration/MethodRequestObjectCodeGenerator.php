@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace GusALN\TelegramBotApi\CodeGeneration;
 
+use GusALN\TelegramBotApi\CodeGeneration\Concerns\GeneratesFromPayloadMethod;
+use GusALN\TelegramBotApi\CodeGeneration\Concerns\GeneratesJsonSerializeMethod;
 use GusALN\TelegramBotApi\CodeGeneration\Definitions\MethodTypeDefinition;
 
+/**
+ * Generates classes for the MethodRequest that contain the method's parameters.
+ */
 class MethodRequestObjectCodeGenerator extends CodeGenerator
 {
+    use GeneratesFromPayloadMethod;
+    use GeneratesJsonSerializeMethod;
+
     public function __construct(private MethodTypeDefinition $definition)
     {
     }
@@ -40,9 +48,7 @@ class MethodRequestObjectCodeGenerator extends CodeGenerator
 
         $usingStatements = $this->generateUsingStatements();
 
-        $constructor = $this->generateConstructorMethod();
-        $fromPayloadMethod = $this->generateFromPayloadMethod();
-        $jsonSerializeMethod = $this->generateJsonSerializeMethod();
+        $content = $this->mergeBlocks($this->generateClassBodyBlocks());
 
         return <<<TXT
             <?php
@@ -55,18 +61,19 @@ class MethodRequestObjectCodeGenerator extends CodeGenerator
             {$docString}
             class {$className} extends MethodRequest
             {
-            {$constructor}
-
-            {$fromPayloadMethod}
-
-            {$jsonSerializeMethod}
-
-                public function method(): string
-                {
-                    return '{$this->definition->name}';
-                }
+            {$content}
             }
             TXT;
+    }
+
+    protected function generateClassBodyBlocks(): array
+    {
+        return [
+            $this->generateConstructorMethod(),
+            $this->generateFromPayloadMethod(),
+            $this->generateJsonSerializeMethod(),
+            $this->generateMethods(),
+        ];
     }
 
     private function generateUsingStatements(): string
@@ -84,6 +91,21 @@ class MethodRequestObjectCodeGenerator extends CodeGenerator
         sort($usingStatements);
 
         return implode("\n", array_unique($usingStatements))."\n";
+    }
+
+    protected function generateDocstring(): string
+    {
+        $docString = ['/**'];
+
+        foreach ($this->definition->description as $descLine) {
+            foreach (explode("\n", $descLine) as $line) {
+                $docString[] = rtrim(" * {$line}");
+            }
+        }
+
+        $docString[] = ' */';
+
+        return implode("\n", $docString);
     }
 
     private function generateConstructorMethod(): string
@@ -137,84 +159,23 @@ class MethodRequestObjectCodeGenerator extends CodeGenerator
         return implode("\n", $constructorDocstring)."\n".implode("\n", $constructorSignature);
     }
 
-    private function generateJsonSerializeMethod(): string
+    protected function getPropertiesDeserializableFromPayload(): array
     {
-        if (empty($this->definition->parameters)) {
-            $lines = [
-                '    public function jsonSerialize(): mixed',
-                '    {',
-                '        return [];',
-                '    }',
-            ];
-
-            return implode("\n", $lines);
-        }
-
-        $jsonSerializeMethod = [
-            '    public function jsonSerialize(): mixed',
-            '    {',
-            '        return array_filter([',
-        ];
-
-        $padding = '            ';
-
-        foreach ($this->definition->parameters as $parameterDefinition) {
-            $key = $parameterDefinition->name;
-            $property = camel_case($parameterDefinition->name);
-
-            $jsonSerializeMethod[] = "{$padding}'{$key}' => \$this->{$property},";
-        }
-
-        $jsonSerializeMethod[] = '        ]);';
-        $jsonSerializeMethod[] = '    }';
-
-        return implode("\n", $jsonSerializeMethod);
+        return $this->definition->parameters;
     }
 
-    private function generateFromPayloadMethod(): string
+    protected function getJsonSerializableProperties(): array
     {
-        if (empty($this->definition->parameters)) {
-            $lines = [
-                '    public static function fromPayload(array $payload): static',
-                '    {',
-                '        return new self();',
-                '    }',
-            ];
-
-            return implode("\n", $lines)."\n";
-        }
-
-        $fromPayloadMethod = [
-            '    public static function fromPayload(array $payload): static',
-            '    {',
-            '        return new self(',
-        ];
-
-        $padding = '            ';
-
-        foreach ($this->definition->parameters as $parameterDefinition) {
-            $key = $parameterDefinition->name;
-            $fromPayloadMethod[] = "{$padding}\$payload['{$key}'],";
-        }
-
-        $fromPayloadMethod[] = '        );';
-        $fromPayloadMethod[] = '    }';
-
-        return implode("\n", $fromPayloadMethod);
+        return $this->definition->parameters;
     }
 
-    private function generateDocstring(): string
+    private function generateMethods()
     {
-        $docString = ['/**'];
-
-        foreach ($this->definition->description as $descLine) {
-            foreach (explode("\n", $descLine) as $line) {
-                $docString[] = " * {$line}";
-            }
-        }
-
-        $docString[] = ' */';
-
-        return implode("\n", $docString);
+        return <<<TXT
+                public function method(): string
+                {
+                    return '{$this->definition->name}';
+                }
+            TXT;
     }
 }

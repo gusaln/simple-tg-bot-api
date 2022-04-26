@@ -33,16 +33,17 @@ class AddStickerToSetRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['user_id'],
             $payload['name'],
-            $payload['png_sticker'],
-            $payload['tgs_sticker'],
-            $payload['webm_sticker'],
+            $payload['png_sticker'] ?? null,
+            isset($payload['tgs_sticker']) ? InputFile::fromPayload($payload['tgs_sticker']) : null,
+            isset($payload['webm_sticker']) ? InputFile::fromPayload($payload['webm_sticker']) : null,
             $payload['emojis'],
-            $payload['mask_position'],
+            isset($payload['mask_position']) ? MaskPosition::fromPayload($payload['mask_position']) : null,
         );
     }
 

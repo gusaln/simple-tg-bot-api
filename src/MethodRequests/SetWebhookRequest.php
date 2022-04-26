@@ -31,15 +31,16 @@ class SetWebhookRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['url'],
-            $payload['certificate'],
-            $payload['ip_address'],
-            $payload['max_connections'],
-            $payload['allowed_updates'],
-            $payload['drop_pending_updates'],
+            isset($payload['certificate']) ? InputFile::fromPayload($payload['certificate']) : null,
+            $payload['ip_address'] ?? null,
+            $payload['max_connections'] ?? null,
+            $payload['allowed_updates'] ?? null,
+            $payload['drop_pending_updates'] ?? null,
         );
     }
 

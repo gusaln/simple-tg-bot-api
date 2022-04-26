@@ -25,12 +25,13 @@ class SetMyCommandsRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
-            $payload['commands'],
-            $payload['scope'],
-            $payload['language_code'],
+            array_map(fn($t) => BotCommand::fromPayload($t), $payload['commands']),
+            isset($payload['scope']) ? BotCommandScope::fromPayload($payload['scope']) : null,
+            $payload['language_code'] ?? null,
         );
     }
 

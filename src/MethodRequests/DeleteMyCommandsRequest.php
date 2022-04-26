@@ -22,11 +22,12 @@ class DeleteMyCommandsRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
-            $payload['scope'],
-            $payload['language_code'],
+            isset($payload['scope']) ? BotCommandScope::fromPayload($payload['scope']) : null,
+            $payload['language_code'] ?? null,
         );
     }
 

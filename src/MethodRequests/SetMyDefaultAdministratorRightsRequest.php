@@ -22,11 +22,12 @@ class SetMyDefaultAdministratorRightsRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
-            $payload['rights'],
-            $payload['for_channels'],
+            isset($payload['rights']) ? ChatAdministratorRights::fromPayload($payload['rights']) : null,
+            $payload['for_channels'] ?? null,
         );
     }
 

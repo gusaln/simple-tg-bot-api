@@ -24,12 +24,13 @@ class SetStickerSetThumbRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['name'],
             $payload['user_id'],
-            $payload['thumb'],
+            $payload['thumb'] ?? null,
         );
     }
 

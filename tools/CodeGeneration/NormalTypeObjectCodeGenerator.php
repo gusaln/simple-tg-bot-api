@@ -75,39 +75,4 @@ class NormalTypeObjectCodeGenerator extends TypeObjectCodeGenerator
 
         return null;
     }
-
-    private function generateFromPayloadMethod(): string
-    {
-        if (empty($this->definition->properties)) {
-            $lines = [
-                '    /** @phpstan-param array<string,mixed> $payload */',
-                '    public static function fromPayload(array $payload): self',
-                '    {',
-                '        return new self();',
-                '    }',
-            ];
-
-            return implode("\n", $lines);
-        }
-
-        $fromPayloadMethod = [
-            '    /** @phpstan-param array<string,mixed> $payload */',
-            '    public static function fromPayload(array $payload): self',
-            '    {',
-            '        return new self(',
-        ];
-
-        $padding = '            ';
-
-        foreach ($this->definition->properties as $propertyDefinition) {
-            $key = $propertyDefinition->name;
-
-            $fromPayloadMethod[] = $this->generateFromPayloadMethodArgument($padding, $key, $propertyDefinition);
-        }
-
-        $fromPayloadMethod[] = '        );';
-        $fromPayloadMethod[] = '    }';
-
-        return implode("\n", $fromPayloadMethod);
-    }
 }

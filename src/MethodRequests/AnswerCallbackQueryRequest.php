@@ -27,14 +27,15 @@ class AnswerCallbackQueryRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['callback_query_id'],
-            $payload['text'],
-            $payload['show_alert'],
-            $payload['url'],
-            $payload['cache_time'],
+            $payload['text'] ?? null,
+            $payload['show_alert'] ?? null,
+            $payload['url'] ?? null,
+            $payload['cache_time'] ?? null,
         );
     }
 

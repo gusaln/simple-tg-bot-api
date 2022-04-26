@@ -58,27 +58,28 @@ class SendPollRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
             $payload['question'],
             $payload['options'],
-            $payload['is_anonymous'],
-            $payload['type'],
-            $payload['allows_multiple_answers'],
-            $payload['correct_option_id'],
-            $payload['explanation'],
-            $payload['explanation_parse_mode'],
-            $payload['explanation_entities'],
-            $payload['open_period'],
-            $payload['close_date'],
-            $payload['is_closed'],
-            $payload['disable_notification'],
-            $payload['protect_content'],
-            $payload['reply_to_message_id'],
-            $payload['allow_sending_without_reply'],
-            $payload['reply_markup'],
+            $payload['is_anonymous'] ?? null,
+            $payload['type'] ?? null,
+            $payload['allows_multiple_answers'] ?? null,
+            $payload['correct_option_id'] ?? null,
+            $payload['explanation'] ?? null,
+            $payload['explanation_parse_mode'] ?? null,
+            isset($payload['explanation_entities']) ? array_map(fn($t) => MessageEntity::fromPayload($t), $payload['explanation_entities']) : null,
+            $payload['open_period'] ?? null,
+            $payload['close_date'] ?? null,
+            $payload['is_closed'] ?? null,
+            $payload['disable_notification'] ?? null,
+            $payload['protect_content'] ?? null,
+            $payload['reply_to_message_id'] ?? null,
+            $payload['allow_sending_without_reply'] ?? null,
+            $payload['reply_markup'] ?? null,
         );
     }
 

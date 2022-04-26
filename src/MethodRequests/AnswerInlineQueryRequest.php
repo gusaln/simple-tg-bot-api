@@ -32,16 +32,17 @@ class AnswerInlineQueryRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['inline_query_id'],
-            $payload['results'],
-            $payload['cache_time'],
-            $payload['is_personal'],
-            $payload['next_offset'],
-            $payload['switch_pm_text'],
-            $payload['switch_pm_parameter'],
+            array_map(fn($t) => InlineQueryResult::fromPayload($t), $payload['results']),
+            $payload['cache_time'] ?? null,
+            $payload['is_personal'] ?? null,
+            $payload['next_offset'] ?? null,
+            $payload['switch_pm_text'] ?? null,
+            $payload['switch_pm_parameter'] ?? null,
         );
     }
 

@@ -107,7 +107,7 @@ final class AbstractTypeObjectCodeGenerator extends TypeObjectCodeGenerator
         return implode("\n", $lines);
     }
 
-    private function generateFromPayloadMethod(): string
+    protected function generateFromPayloadMethod(): string
     {
         if ('InputMessageContent' == $this->definition->name) {
             return $this->generateFromPayloadMethodForInputMessageContent();

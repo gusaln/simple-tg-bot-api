@@ -73,7 +73,8 @@ class SendInvoiceRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
@@ -82,27 +83,27 @@ class SendInvoiceRequest extends MethodRequest
             $payload['payload'],
             $payload['provider_token'],
             $payload['currency'],
-            $payload['prices'],
-            $payload['max_tip_amount'],
-            $payload['suggested_tip_amounts'],
-            $payload['start_parameter'],
-            $payload['provider_data'],
-            $payload['photo_url'],
-            $payload['photo_size'],
-            $payload['photo_width'],
-            $payload['photo_height'],
-            $payload['need_name'],
-            $payload['need_phone_number'],
-            $payload['need_email'],
-            $payload['need_shipping_address'],
-            $payload['send_phone_number_to_provider'],
-            $payload['send_email_to_provider'],
-            $payload['is_flexible'],
-            $payload['disable_notification'],
-            $payload['protect_content'],
-            $payload['reply_to_message_id'],
-            $payload['allow_sending_without_reply'],
-            $payload['reply_markup'],
+            array_map(fn($t) => LabeledPrice::fromPayload($t), $payload['prices']),
+            $payload['max_tip_amount'] ?? null,
+            $payload['suggested_tip_amounts'] ?? null,
+            $payload['start_parameter'] ?? null,
+            $payload['provider_data'] ?? null,
+            $payload['photo_url'] ?? null,
+            $payload['photo_size'] ?? null,
+            $payload['photo_width'] ?? null,
+            $payload['photo_height'] ?? null,
+            $payload['need_name'] ?? null,
+            $payload['need_phone_number'] ?? null,
+            $payload['need_email'] ?? null,
+            $payload['need_shipping_address'] ?? null,
+            $payload['send_phone_number_to_provider'] ?? null,
+            $payload['send_email_to_provider'] ?? null,
+            $payload['is_flexible'] ?? null,
+            $payload['disable_notification'] ?? null,
+            $payload['protect_content'] ?? null,
+            $payload['reply_to_message_id'] ?? null,
+            $payload['allow_sending_without_reply'] ?? null,
+            isset($payload['reply_markup']) ? InlineKeyboardMarkup::fromPayload($payload['reply_markup']) : null,
         );
     }
 

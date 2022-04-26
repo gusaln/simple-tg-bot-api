@@ -42,19 +42,20 @@ class SendMessageRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
             $payload['text'],
-            $payload['parse_mode'],
-            $payload['entities'],
-            $payload['disable_web_page_preview'],
-            $payload['disable_notification'],
-            $payload['protect_content'],
-            $payload['reply_to_message_id'],
-            $payload['allow_sending_without_reply'],
-            $payload['reply_markup'],
+            $payload['parse_mode'] ?? null,
+            isset($payload['entities']) ? array_map(fn($t) => MessageEntity::fromPayload($t), $payload['entities']) : null,
+            $payload['disable_web_page_preview'] ?? null,
+            $payload['disable_notification'] ?? null,
+            $payload['protect_content'] ?? null,
+            $payload['reply_to_message_id'] ?? null,
+            $payload['allow_sending_without_reply'] ?? null,
+            $payload['reply_markup'] ?? null,
         );
     }
 

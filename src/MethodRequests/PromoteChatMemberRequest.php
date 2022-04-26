@@ -43,22 +43,23 @@ class PromoteChatMemberRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['chat_id'],
             $payload['user_id'],
-            $payload['is_anonymous'],
-            $payload['can_manage_chat'],
-            $payload['can_post_messages'],
-            $payload['can_edit_messages'],
-            $payload['can_delete_messages'],
-            $payload['can_manage_video_chats'],
-            $payload['can_restrict_members'],
-            $payload['can_promote_members'],
-            $payload['can_change_info'],
-            $payload['can_invite_users'],
-            $payload['can_pin_messages'],
+            $payload['is_anonymous'] ?? null,
+            $payload['can_manage_chat'] ?? null,
+            $payload['can_post_messages'] ?? null,
+            $payload['can_edit_messages'] ?? null,
+            $payload['can_delete_messages'] ?? null,
+            $payload['can_manage_video_chats'] ?? null,
+            $payload['can_restrict_members'] ?? null,
+            $payload['can_promote_members'] ?? null,
+            $payload['can_change_info'] ?? null,
+            $payload['can_invite_users'] ?? null,
+            $payload['can_pin_messages'] ?? null,
         );
     }
 

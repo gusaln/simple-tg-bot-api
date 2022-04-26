@@ -20,8 +20,7 @@ class MenuButtonDefault extends MenuButton implements JsonSerializable
     /** @phpstan-param array<string,mixed> $payload */
     public static function fromPayload(array $payload): self
     {
-        return new self(
-        );
+        return new self();
     }
 
     public function jsonSerialize(): mixed

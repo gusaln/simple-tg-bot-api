@@ -23,12 +23,13 @@ class AnswerPreCheckoutQueryRequest extends MethodRequest
     ) {
     }
 
-    public static function fromPayload(array $payload): static
+    /** @phpstan-param array<string,mixed> $payload */
+    public static function fromPayload(array $payload): self
     {
         return new self(
             $payload['pre_checkout_query_id'],
             $payload['ok'],
-            $payload['error_message'],
+            $payload['error_message'] ?? null,
         );
     }
 
