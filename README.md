@@ -3,7 +3,6 @@
 [![Telegram bot api][ico-bot-api]][link-bot-api]
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE)
-[![PHP Version >= 8.0][ico-php-v]][link-php-8-0]
 
 Minimalist strongly-typed Telegram Bot API.
 
@@ -103,7 +102,9 @@ abstract class MenuButton implements JsonSerializable
 }
 ```
 
-The only exception to this is the `InputMessageContent` family of types which do not have a specific property-value pair that defines then, and other methods are used to identified them.
+The first exception to this pattern is the `InputMessageContent` family of types which do not have a specific property-value pair that defines then, and other methods are used to identified them.
+
+The other one is the type `MessageEntity`, that despite not being part of a family, has their type string specified in constants.
 
 ### Enums
 
@@ -173,4 +174,4 @@ The MIT License (MIT). Please see [License File](LICENSE) for more information.
 [link-bot-api]: https://core.telegram.org/bots/api
 [link-packagist]: https://packagist.org/packages/gusaln/simple-tg-bot-api
 [link-downloads]: https://packagist.org/packages/gusaln/simple-tg-bot-api
-[link-php-8-0]: https://www.php.net/releases/8.0
+[link-php-8-0]: https://www.php.net/releases/8.0/en.html

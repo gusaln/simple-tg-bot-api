@@ -31,6 +31,8 @@ final class ChildTypeWithTypePropertyObjectCodeGenerator extends TypeObjectCodeG
         $namespace = self::getClassNamespace();
         $className = self::getClassName($this->definition);
 
+        $content = $this->mergeBlocks($this->generateClassBodyBlocks());
+
         return <<<TXT
             <?php
 
@@ -42,17 +44,20 @@ final class ChildTypeWithTypePropertyObjectCodeGenerator extends TypeObjectCodeG
             {$this->generateDocstring()}
             class {$className} extends {$this->definition->parent} implements JsonSerializable
             {
-            {$this->generateProperties()}
-
-            {$this->generateConstructorMethod()}
-
-            {$this->generateFromPayloadMethod()}
-
-            {$this->generateJsonSerializeMethod()}
-
-            {$this->generateMethods()}
+            {$content}
             }
             TXT;
+    }
+
+    protected function generateClassBodyBlocks(): array
+    {
+        return [
+            $this->generateProperties(),
+            $this->generateConstructorMethod(),
+            $this->generateFromPayloadMethod(),
+            $this->generateJsonSerializeMethod(),
+            $this->generateMethods(),
+        ];
     }
 
     private function generateProperties(): string
@@ -119,7 +124,7 @@ final class ChildTypeWithTypePropertyObjectCodeGenerator extends TypeObjectCodeG
 
             $key = $propertyDefinition->name;
 
-            $fromPayloadMethod[] = $this->generateFromMethodArgument($padding, $key, $propertyDefinition);
+            $fromPayloadMethod[] = $this->generateFromPayloadMethodArgument($padding, $key, $propertyDefinition);
         }
 
         $fromPayloadMethod[] = '        );';

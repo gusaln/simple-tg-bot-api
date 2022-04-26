@@ -56,28 +56,43 @@ abstract class TypeObjectCodeGenerator extends CodeGenerator
         return implode("\n", array_unique($usingStatements))."\n";
     }
 
+    /**
+     * Generates the blocks of the class.
+     *
+     * @return array<int, string|null>
+     */
+    abstract protected function generateClassBodyBlocks(): array;
+
+    /**
+     * Stitches the blocks of a class together.
+     *
+     * If a block is null, it will be left out of the contents of the class.
+     *
+     * @param array<int, string|null> $block
+     */
+    protected function mergeBlocks(array $block): string
+    {
+        return implode("\n\n", array_filter($block));
+    }
+
+    protected function generateDocstring(): string
+    {
+        $docString = ['/**'];
+
+        foreach ($this->definition->description as $descLine) {
+            foreach (explode("\n", $descLine) as $line) {
+                $docString[] = rtrim(" * {$line}");
+            }
+        }
+
+        $docString[] = ' */';
+
+        return implode("\n", $docString);
+    }
+
     protected function generateConstructorMethod(): string
     {
         return $this->generateConstructorMethodForProperties($this->definition->properties);
-    }
-
-    protected function generateFromMethodArgument(string $padding, string $key, TypedDefinition $definition)
-    {
-        if ($definition->isUnion() || $this->isPrimitive($definition->singleType())) {
-            return $definition->isNullable()
-                ? "{$padding}\$payload['{$key}'] ?? null,"
-                : "{$padding}\$payload['{$key}'],";
-        }
-
-        $objectClass = $definition->singleType();
-
-        $objectMapping = $definition->isArray
-            ? "array_map(fn(\$t) => {$objectClass}::fromPayload(\$t), \$payload['{$key}'])"
-            : "{$objectClass}::fromPayload(\$payload['{$key}'])";
-
-        return $definition->isNullable()
-                ? "{$padding}isset(\$payload['{$key}']) ? {$objectMapping} : null,"
-                : "{$padding}$objectMapping,";
     }
 
     /**
@@ -133,6 +148,25 @@ abstract class TypeObjectCodeGenerator extends CodeGenerator
         return implode("\n", $constructorDocstring)."\n".implode("\n", $constructorSignature);
     }
 
+    protected function generateFromPayloadMethodArgument(string $padding, string $key, TypedDefinition $definition)
+    {
+        if ($definition->isUnion() || $this->isPrimitive($definition->singleType())) {
+            return $definition->isNullable()
+                ? "{$padding}\$payload['{$key}'] ?? null,"
+                : "{$padding}\$payload['{$key}'],";
+        }
+
+        $objectClass = $definition->singleType();
+
+        $objectMapping = $definition->isArray
+            ? "array_map(fn(\$t) => {$objectClass}::fromPayload(\$t), \$payload['{$key}'])"
+            : "{$objectClass}::fromPayload(\$payload['{$key}'])";
+
+        return $definition->isNullable()
+                ? "{$padding}isset(\$payload['{$key}']) ? {$objectMapping} : null,"
+                : "{$padding}$objectMapping,";
+    }
+
     protected function generateJsonSerializeMethod(): string
     {
         if (empty($this->definition->properties)) {
@@ -166,20 +200,5 @@ abstract class TypeObjectCodeGenerator extends CodeGenerator
         $jsonSerializeMethod[] = '    }';
 
         return implode("\n", $jsonSerializeMethod);
-    }
-
-    protected function generateDocstring(): string
-    {
-        $docString = ['/**'];
-
-        foreach ($this->definition->description as $descLine) {
-            foreach (explode("\n", $descLine) as $line) {
-                $docString[] = rtrim(" * {$line}");
-            }
-        }
-
-        $docString[] = ' */';
-
-        return implode("\n", $docString);
     }
 }

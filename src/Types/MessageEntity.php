@@ -12,6 +12,23 @@ use JsonSerializable;
  */
 class MessageEntity implements JsonSerializable
 {
+    public const MESSAGE_MENTION_TYPE = "mention";
+    public const MESSAGE_HASHTAG_TYPE = "hashtag";
+    public const MESSAGE_CASHTAG_TYPE = "cashtag";
+    public const MESSAGE_BOT_COMMAND_TYPE = "bot_command";
+    public const MESSAGE_URL_TYPE = "url";
+    public const MESSAGE_EMAIL_TYPE = "email";
+    public const MESSAGE_PHONE_NUMBER_TYPE = "phone_number";
+    public const MESSAGE_BOLD_TYPE = "bold";
+    public const MESSAGE_ITALIC_TYPE = "italic";
+    public const MESSAGE_UNDERLINE_TYPE = "underline";
+    public const MESSAGE_STRIKETHROUGH_TYPE = "strikethrough";
+    public const MESSAGE_SPOILER_TYPE = "spoiler";
+    public const MESSAGE_CODE_TYPE = "code";
+    public const MESSAGE_PRE_TYPE = "pre";
+    public const MESSAGE_TEXT_LINK_TYPE = "text_link";
+    public const MESSAGE_TEXT_MENTION_TYPE = "text_mention";
+
     /**
      * @param string $type Type of the entity. Currently, can be "mention" (@username), "hashtag" (#hashtag), "cashtag" ($USD), "bot_command" (/start@jobs_bot), "url" (https://telegram.org), "email" (do-not-reply@telegram.org), "phone_number" (+1-212-555-0123), "bold" (bold text), "italic" (italic text), "underline" (underlined text), "strikethrough" (strikethrough text), "spoiler" (spoiler message), "code" (monowidth string), "pre" (monowidth block), "text_link" (for clickable text URLs), "text_mention" (for users without usernames)
      * @param int $offset Offset in UTF-16 code units to the start of the entity

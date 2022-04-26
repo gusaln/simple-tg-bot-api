@@ -30,27 +30,8 @@ final class AbstractTypeObjectCodeGenerator extends TypeObjectCodeGenerator
     {
         $namespace = self::getClassNamespace();
         $className = self::getClassName($this->definition);
-        $fromPayloadMethod = $this->generateFromPayloadMethod();
 
-        if (empty($this->typePropertyName)) {
-            return <<<TXT
-                <?php
-
-                declare(strict_types=1);
-
-                namespace {$namespace};
-
-                {$this->generateUsingStatements()}
-                {$this->generateDocstring()}
-                abstract class {$className} implements JsonSerializable
-                {
-                {$fromPayloadMethod}
-                }
-                TXT;
-        }
-
-        $consts = $this->generateTypeConsts();
-        $typeMethod = camel_case($this->typePropertyName);
+        $content = $this->mergeBlocks($this->generateClassBodyBlocks());
 
         return <<<TXT
             <?php
@@ -63,13 +44,29 @@ final class AbstractTypeObjectCodeGenerator extends TypeObjectCodeGenerator
             {$this->generateDocstring()}
             abstract class {$className} implements JsonSerializable
             {
-            {$consts}
-
-                abstract public function {$typeMethod}(): string;
-
-            {$fromPayloadMethod}
+            {$content}
             }
             TXT;
+    }
+
+    protected function generateClassBodyBlocks(): array
+    {
+        return [
+            $this->generateConstants(),
+            $this->generateTypePropertyMethod(),
+            $this->generateFromPayloadMethod(),
+        ];
+    }
+
+    private function generateTypePropertyMethod(): ?string
+    {
+        if (empty($this->typePropertyName)) {
+            return null;
+        }
+
+        $typeMethod = camel_case($this->typePropertyName);
+
+        return "    abstract public function {$typeMethod}(): string;";
     }
 
     protected function generateUsingStatements(): string
@@ -92,8 +89,12 @@ final class AbstractTypeObjectCodeGenerator extends TypeObjectCodeGenerator
         return implode("\n", array_unique($usingStatements))."\n";
     }
 
-    private function generateTypeConsts(): string
+    private function generateConstants(): ?string
     {
+        if (empty($this->typePropertyName)) {
+            return null;
+        }
+
         $lines = [];
 
         $padding = '    ';
